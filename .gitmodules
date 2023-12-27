@@ -10,3 +10,6 @@
 [submodule "third-party/DinguxCommander"]
 	path = third-party/DinguxCommander
 	url = https://github.com/OnionUI/app-DinguxCommander
+[submodule "third-party/picocom"]
+	path = third-party/picocom
+	url = https://github.com/MagneFire/picocom.git
