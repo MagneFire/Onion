@@ -188,6 +188,8 @@ external: $(CACHE)/.setup $(THIRD_PARTY_DIR)/RetroArch/retroarch_miyoo354
 	@cd $(THIRD_PARTY_DIR)/Terminal && make && cp ./st "$(BIN_DIR)"
 	@$(ECHO) $(COLOR_BLUE)"\n-- Build DinguxCommander"$(COLOR_NORMAL)
 	@cd $(THIRD_PARTY_DIR)/DinguxCommander && make && cp ./output/DinguxCommander "$(PACKAGES_APP_DEST)/File Explorer (DinguxCommander)/App/Commander_Italic"
+	@$(ECHO) $(COLOR_BLUE)"\n-- Build picocom"$(COLOR_NORMAL)
+	@cd $(THIRD_PARTY_DIR)/picocom && make clean && make && cp ./picocom "$(BIN_DIR)"
 
 dist: build
 	@$(ECHO) $(PRINT_RECIPE)
