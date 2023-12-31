@@ -135,6 +135,7 @@ core: $(CACHE)/.setup
 	@cd $(SRC_DIR)/read_uuid && BUILD_DIR=$(BIN_DIR) make
 	@cd $(SRC_DIR)/detectKey && BUILD_DIR=$(BIN_DIR) make
 	@cd $(SRC_DIR)/axp && BUILD_DIR=$(BIN_DIR) make
+	@cd $(SRC_DIR)/kcx && BUILD_DIR=$(BIN_DIR) make
 	@cd $(SRC_DIR)/pressMenu2Kill && BUILD_DIR=$(BIN_DIR) make
 	@cd $(SRC_DIR)/pngScale && BUILD_DIR=$(BIN_DIR) make
 	@cd $(SRC_DIR)/libgamename && BUILD_DIR=$(BIN_DIR) make
