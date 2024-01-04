@@ -627,6 +627,9 @@ void menu_bluetooth(void *pt)
 
     snprintf(_menu_bluetooth.items[0].label, STR_MAX - 1, "Bluetooth is %sconnected.", is_connected ? "" : "not ");
     menu_stack[++menu_level] = &_menu_bluetooth;
+
+    reset_menus = true;
+    all_changed = true;
     header_changed = true;
 }
 
@@ -672,7 +675,12 @@ void menu_wifi(void *_)
 
 void menu_network(void *_)
 {
-    is_powered = kcx_is_powered();
+    bool new_power_state = kcx_is_powered();
+    if (new_power_state != is_powered) {
+        is_powered = new_power_state;
+        reset_menus = true;
+        all_changed = true;
+    }
     if (!_menu_network._created) {
         _menu_network = list_create(9, LIST_SMALL);
         strcpy(_menu_network.title, "Network");
