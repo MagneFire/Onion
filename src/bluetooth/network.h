@@ -525,7 +525,7 @@ void kcx_set_powered_state(void *pt)
         if (kcx_is_powered() == enabled) {
             break;
         }
-        usleep(100 * 1000);
+        usleep(500 * 1000);
     }
     reset_menus = true;
     all_changed = true;
