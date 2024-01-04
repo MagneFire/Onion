@@ -533,9 +533,7 @@ void kcx_set_powered_state(void *pt)
 
 bool kcx_is_connected()
 {
-    uint8_t status = kcx_read(0x00);
-    if (status < 0) return false;
-    return status & 0x01;
+    return kcx_read(0x02) > 0;
 }
 
 void kcx_set_connection_state(void *pt)
