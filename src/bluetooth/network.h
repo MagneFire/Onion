@@ -509,9 +509,6 @@ bool is_powered = false;
 
 bool kcx_is_powered()
 {
-    // uint8_t status = kcx_read(0x00);
-    // if (status < 0) return false;
-    // return status & 0x00;
     return kcx_read(0x01) > 0;
 }
 
@@ -528,7 +525,6 @@ void kcx_set_powered_state(void *pt)
         if (kcx_is_powered() == enabled) {
             break;
         }
-        // sleep(1);
         usleep(100 * 1000);
     }
     reset_menus = true;
