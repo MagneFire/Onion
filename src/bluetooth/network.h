@@ -567,20 +567,6 @@ void kcx_set_volume_state(void *pt)
     all_changed = true;
 }
 
-void kcx_set_min_volume_state(void *pt)
-{
-    int target_volume = 10;
-    kcx_set_volume(target_volume);
-    for (int i=0; i < 10; i++) {
-        if (kcx_get_volume() == target_volume) {
-            break;
-        }
-        usleep(100 * 1000);
-    }
-    reset_menus = true;
-    all_changed = true;
-}
-
 void menu_bluetooth(void *pt)
 {
     is_powered = kcx_is_powered();
@@ -618,11 +604,6 @@ void menu_bluetooth(void *pt)
                                      .value = volume,
                                      .action = kcx_set_volume_state},
                                  "Change the bluetooth volume (10-31).");
-        list_addItemWithInfoNote(&_menu_bluetooth,
-                                 (ListItem){
-                                     .label = "Min volume",
-                                     .action = kcx_set_min_volume_state},
-                                 "Sets Bluetooth volume to minimum possible.");
     }
 
     snprintf(_menu_bluetooth.items[0].label, STR_MAX - 1, "Bluetooth is %sconnected.", is_connected ? "" : "not ");
