@@ -165,6 +165,12 @@ void formatter_meterWidth(void *pt, char *out_label)
     sprintf(out_label, "%d px", item->value);
 }
 
+void formatter_bluetooth_volume(void *pt, char *out_label)
+{
+    ListItem *item = (ListItem *)pt;
+    sprintf(out_label, "%d", item->value);
+}
+
 void formatter_startupTab(void *pt, char *out_label)
 {
     ListItem *item = (ListItem *)pt;

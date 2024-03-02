@@ -13,6 +13,7 @@
 
 #include "components/list.h"
 #include "system/keymap_sw.h"
+#include "system/kcx.h"
 #include "theme/render/dialog.h"
 #include "theme/sound.h"
 #include "utils/apply_icons.h"
@@ -581,6 +582,115 @@ void menu_vnc(void *pt)
     header_changed = true;
 }
 
+bool is_powered = false;
+
+bool kcx_is_powered()
+{
+    return kcx_read(0x01) > 0;
+}
+
+void kcd_set_powered(bool power_on)
+{
+    kcx_write(0x01, power_on);
+}
+
+void kcx_set_powered_state(void *pt)
+{
+    bool enabled = ((ListItem *)pt)->value == 1;
+    kcd_set_powered(enabled);
+    for (int i=0; i < 20; i++) {
+        if (kcx_is_powered() == enabled) {
+            break;
+        }
+        usleep(500 * 1000);
+    }
+    reset_menus = true;
+    all_changed = true;
+}
+
+bool kcx_is_connected()
+{
+    return kcx_read(0x02) > 0;
+}
+
+void kcx_set_connection_state(void *pt)
+{
+    kcx_write(0x02, 0xFF);
+    reset_menus = true;
+    all_changed = true;
+}
+
+uint8_t kcx_get_volume()
+{
+    return kcx_read(0x04);
+}
+
+void kcx_set_volume(uint8_t volume)
+{
+    kcx_write(0x04, volume);
+}
+
+void kcx_set_volume_state(void *pt)
+{
+    int target_volume = ((ListItem *)pt)->value;
+    kcx_set_volume(target_volume);
+    for (int i=0; i < 10; i++) {
+        if (kcx_get_volume() == target_volume) {
+            break;
+        }
+        usleep(100 * 1000);
+    }
+    reset_menus = true;
+    all_changed = true;
+}
+
+void menu_bluetooth(void *pt)
+{
+    is_powered = kcx_is_powered();
+    uint8_t volume = kcx_get_volume();
+    bool is_connected = kcx_is_connected();
+
+    ListItem *item = (ListItem *)pt;
+    item->value = (int)is_powered;
+
+    if (!_menu_bluetooth._created) {
+        _menu_bluetooth = list_create(5, LIST_SMALL);
+        strcpy(_menu_bluetooth.title, "Bluetooth");
+        list_addItem(&_menu_bluetooth,
+                     (ListItem){
+                         .label = "Bluetooth is not connected.",
+                         .disabled = true,
+                         .action = NULL});
+        list_addItem(&_menu_bluetooth,
+                                 (ListItem){
+                                     .label = "Bluetooth",
+                                     .item_type = TOGGLE,
+                                     .value = (int)is_powered,
+                                     .action = kcx_set_powered_state});
+        list_addItemWithInfoNote(&_menu_bluetooth,
+                                 (ListItem){
+                                     .label = "Connect",
+                                     .action = kcx_set_connection_state},
+                                 "Connect/Pair to a discoverable device.");
+        list_addItemWithInfoNote(&_menu_bluetooth,
+                                 (ListItem){
+                                     .label = "Volume",
+                                     .item_type = MULTIVALUE,
+                                     .value_max = 31,
+                                     .value_formatter = formatter_bluetooth_volume,
+                                     .value = volume,
+                                     .action = kcx_set_volume_state},
+                                 "Change the bluetooth volume (10-31).");
+    }
+
+    snprintf(_menu_bluetooth.items[0].label, STR_MAX - 1, "Bluetooth is %sconnected.", is_connected ? "" : "not ");
+    menu_stack[++menu_level] = &_menu_bluetooth;
+
+    reset_menus = true;
+    all_changed = true;
+    header_changed = true;
+}
+
 void menu_wifi(void *_)
 {
     if (!_menu_wifi._created) {
@@ -624,7 +734,7 @@ void menu_wifi(void *_)
 void menu_network(void *_)
 {
     if (!_menu_network._created) {
-        _menu_network = list_create(9, LIST_SMALL);
+        _menu_network = list_create(10, LIST_SMALL);
         strcpy(_menu_network.title, "Network");
 
         network_loadState();
@@ -634,6 +744,10 @@ void menu_network(void *_)
                          .label = "IP address: N/A",
                          .disabled = true,
                          .action = NULL});
+        list_addItem(&_menu_network,
+                                 (ListItem){
+                                     .label = "Bluetooth...",
+                                     .action = menu_bluetooth});
         list_addItem(&_menu_network,
                      (ListItem){
                          .label = "WiFi: Hotspot/WPS...",
